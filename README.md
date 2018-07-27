@@ -6,8 +6,10 @@
 
 `linkcheck` was created in order to ensure that none of your files have broken links.
 
-I use it specifically to check my documentation, notes and recipes every once in a while
-for valid URLs.
+I use it personally to check my documentation, notes and recipes every once in a while
+for valid URLs. I am aware that in case of [Sphinx documentation](http://www.sphinx-doc.org/en/master/)
+there is already a bundled `linkcheck` tool. However this does not work on `raw::` sections.
+
 
 ## Requirements
 
