@@ -20,25 +20,25 @@ there is already a bundled `linkcheck` tool. However this does not work on `raw:
 ## Examples
 
 #### Scan all files in current directory for httpd 200
-```
+```bash
 # Ensure all URLs found in all files in current directory return 200
 linkcheck
 ```
 
 #### Scan Markdown and text files
-```
+```bash
 # Ensure either 200, 301 or 302 are returned
 linkcheck -e 'md,txt' -c '200,301,302' path/to/my/docs
 ```
 
 #### Be strict on sphinx files
-```
+```bash
 # Ensure only 200 is returned
 linkcheck -e 'rst' -c '200' path/to/my/docs
 ```
 
 #### Ignore specific URLs
-```
+```bash
 # Ignore localhost* and 127.0.0.1*
 linkcheck -i '^http(s)?:\/\/(localhost|127\.0\.0\.1).*' path/to/my/docs
 ```
