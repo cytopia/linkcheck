@@ -39,8 +39,8 @@ linkcheck -e 'rst' -c '200' path/to/my/docs
 
 #### Ignore specific URLs
 ```bash
-# Ignore localhost* and 127.0.0.1*
-linkcheck -i '^http(s)?:\/\/(localhost|127\.0\.0\.1).*' path/to/my/docs
+# Ignore localhost, 127.0.0.1 and *.loc domains
+linkcheck -i '^http(s)?:\/\/(localhost)|(127\.0\.0\.1|.)|(.+\.loc).*$' path/to/my/docs
 ```
 
 
@@ -59,7 +59,7 @@ Options:
             -e sh,py.c,h
 
 -i        Ignore all URLs matching the specified regex.
-          Defaults to: ^http(s)?:\/\/(127\.0\.0\.1)|(localhost)|(.+\.loc).*$
+          Defaults to: ^http(s)?:\/\/(127\.0\.0\.1)|(localhost).*$
           Accepts a single regex string:
             -i '^http(?):\/\/my-comapny.com.*$'
 

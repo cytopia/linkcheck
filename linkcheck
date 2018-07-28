@@ -26,7 +26,7 @@ EXTENSIONS=""
 ###
 ### Regex to exclude URLs from being tested
 ###
-URL_REGEX_EXCLUDE="^http(s)?:\/\/(127\.0\.0\.1)|(localhost)|(.+\.loc).*$"
+URL_REGEX_EXCLUDE="^http(s)?:\/\/(127\.0\.0\.1)|(localhost).*$"
 
 
 ###
@@ -72,7 +72,7 @@ print_usage() {
 	echo "            -e sh,py.c,h"
 	echo
 	echo "-i        Ignore all URLs matching the specified regex."
-	echo '          Defaults to: ^http(s)?:\/\/(127\.0\.0\.1)|(localhost)|(.+\.loc).*$'
+	echo '          Defaults to: ^http(s)?:\/\/(127\.0\.0\.1)|(localhost).*$'
 	echo "          Accepts a single regex string:"
 	echo "            -i '^http(?):\/\/my-comapny.com.*$'"
 	echo
@@ -114,7 +114,7 @@ print_usage() {
 ### Version
 ###
 print_version() {
-	echo "linkcheck v0.1 by cytopia"
+	echo "linkcheck v0.2 by cytopia"
 	echo "https://github.com/cytopia/linkcheck"
 }
 
