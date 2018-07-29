@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Bestrict
+# Be strict
 set -e
 set -u
 set -o pipefail
