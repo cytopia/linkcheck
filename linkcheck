@@ -57,7 +57,7 @@ STATUS_CODES=200
 ###
 URL_REGEX="http(s)?:\\/\\/[-+%=?&():,._/#0-9a-zA-Z]+"
 
-MY_VERSION="v0.3"
+MY_VERSION="v0.4"
 
 
 ############################################################
@@ -209,23 +209,22 @@ probe_urls() {
 	# Probe each url
 	for url in ${urls}; do
 
-		# Try to curl multiple times in case host is currently not reachable
-		i=0; fail=0
-		eval "$( curl -SsI --connect-timeout "${timeout}" "${url}" 2> >(setval errval) > >(setval header); <<<"$?" setval retval;  )"
-		# shellcheck disable=SC2154
-		while [ "${retval}" != "0" ] ; do
-			i=$(( i + 1 ))
-			sleep 2
-			if [ "${i}" -ge "${retries}" ]; then
-				fail=1
-				break;
-			fi
-		done
+		printf "\\e[0;33m[TEST]\\e[0m %s ..." "${url}"
+
+		# Get header from URL
+		eval "$( curl -SsI \
+			--retry-delay 2 \
+			--retry-connrefused \
+			--retry "${retries}" \
+			--connect-timeout "${timeout}" \
+			"${url}" 2> >(setval errval) > >(setval header); <<<"$?" setval retval;
+		)"
 
 		# Curl request failed
-		if [ "${fail}" = "1" ]; then
+		# shellcheck disable=SC2154
+		if [ "${retval}" != "0" ]; then
 			# shellcheck disable=SC2154
-			printf "\\e[0;31m[FAIL]\\e[0m %s %s\\n" "${url}" "${errval}"
+			printf "\\r\\e[0;31m[FAIL]\\e[0m %s %s\\n" "${url}" "${errval}"
 
 		# Curl request succeeded
 		else
@@ -235,10 +234,10 @@ probe_urls() {
 
 			#if [ "${stat}" != "200" ]; then
 			if ! echo "${stat}" | grep -qE "${status_codes}"; then
-				printf "\\e[0;31m[ERR]\\e[0m  %s \\e[0;31m%s\\e[0m\\n" "${url}" "${line}"
+				printf "\\r\\e[0;31m[ERR]\\e[0m  %s \\e[0;31m%s\\e[0m\\n" "${url}" "${line}"
 				ret_code=1
 			else
-				printf "\\e[0;32m[OK]\\e[0m   %s \\e[0;32m[%s]\\e[0m\\n" "${url}" "${stat}"
+				printf "\\r\\e[0;32m[OK]\\e[0m   %s \\e[0;32m[%s]\\e[0m\\n" "${url}" "${stat}"
 			fi
 		fi
 	done
