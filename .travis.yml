@@ -1,0 +1,25 @@
+---
+
+###
+### Travis settings
+###
+sudo: required
+
+
+install:
+  # Add more modern repos
+  - max=100; i=0; while [ $i -lt $max ]; do if sudo apt-get update; then break; else i=$((i+1)); fi done
+  - max=100; i=0; while [ $i -lt $max ]; do if sudo apt-get -y install python-software-properties; then break; else i=$((i+1)); fi done
+  - sudo add-apt-repository -y ppa:brightbox/ruby-ng
+  - sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu/ trusty-backports restricted main universe"
+
+  # Install dependencies
+  - max=100; i=0; while [ $i -lt $max ]; do if sudo apt-get update; then break; else i=$((i+1)); fi done
+  - max=100; i=0; while [ $i -lt $max ]; do if sudo apt-get -y install
+        shellcheck;
+        then break; else i=$((i+1)); fi done
+
+
+script:
+  - make lint
+  - make test
