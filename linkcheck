@@ -26,7 +26,7 @@ EXTENSIONS=""
 ###
 ### Regex to exclude URLs from being tested
 ###
-URL_REGEX_EXCLUDE="^http(s)?:\/\/(127\.0\.0\.1)|(localhost).*$"
+URL_REGEX_EXCLUDE="^http(s)?:\\/\\/(127\\.0\\.0\\.1)|(localhost).*$"
 
 
 ###
@@ -47,6 +47,17 @@ RETRIES=3
 ###
 STATUS_CODES=200
 
+
+############################################################
+# Fixed global variables
+############################################################
+
+###
+### Regex to scan for URLs
+###
+URL_REGEX="http(s)?:\\/\\/[-+%=?&():,._/#0-9a-zA-Z]+"
+
+MY_VERSION="v0.3"
 
 
 ############################################################
@@ -74,7 +85,7 @@ print_usage() {
 	echo "-i        Ignore all URLs matching the specified regex."
 	echo '          Defaults to: ^http(s)?:\/\/(127\.0\.0\.1)|(localhost).*$'
 	echo "          Accepts a single regex string:"
-	echo "            -i '^http(?):\/\/my-comapny.com.*$'"
+	echo "            -i '^http(?):\\/\\/my-comapny.com.*$'"
 	echo
 	echo "-t        Specify curl timeout in seconds, after which probing stops for one url."
 	echo "          Defaults to 10 seconds."
@@ -114,7 +125,7 @@ print_usage() {
 ### Version
 ###
 print_version() {
-	echo "linkcheck v0.2 by cytopia"
+	echo "linkcheck ${MY_VERSION} by cytopia"
 	echo "https://github.com/cytopia/linkcheck"
 }
 
@@ -129,30 +140,46 @@ setval() {
 
 
 ###
+### Sanitize URL
+###
+sanitize_url() {
+	local url="${1}"
+	local invalid="[,.!]$"
+
+	# Remove any trailing garbage
+	while [[ ${url} =~ ${invalid} ]]; do
+		url="${url::-1}"
+	done
+
+	echo "${url}"
+}
+
+
+###
 ### Gather URLs from files
 ###
 gather_urls() {
 	local path="${1}"
 	local extensions="${2}"
-	local reg_exclude="${3}"
+	local reg_include="${3}"
+	local reg_exclude="${4}"
 
-	local url_regex="http(s)?:\/\/[-=?:,._/#0-9a-zA-Z]+"
 	local find_ext=
 	local find_cmd=
 
 	if [ -n "${extensions}" ]; then
-		find_ext="\( -iname \*.${extensions//,/ -o -iname \\*.} \)"
+		find_ext="\\( -iname \\*.${extensions//,/ -o -iname \\*.} \\)"
 	fi
 
-	find_cmd="find ${path} ${find_ext} -type f -exec grep --binary-files=without-match -Eo '${url_regex}' '{}' \;"
+	find_cmd="find ${path} ${find_ext} -type f -exec grep --binary-files=without-match -Eo '${reg_include}' '{}' \\; | sort -u"
 	>&2 echo "\$ ${find_cmd}"
 
 	# Loop through uniqued URLs
 	for url in $(eval "${find_cmd}" 2>/dev/null | sort -u); do
 		# Ignore any 'Binary file...' results
 		if echo "${url}" | grep -Eq '^htt'; then
-			# Remove any trailing: [,.]
-			url="$( echo "${url}" | sed 's/[,.]$//g')"
+			# Remove any trailing garbage
+			url="$( sanitize_url "${url}" )"
 
 			# Ignore URLs excluded by regex
 			if ! echo "${url}" | grep -qE "${reg_exclude}"; then
@@ -176,11 +203,16 @@ probe_urls() {
 	status_codes="${status_codes//,/|}"          # comma to |
 	status_codes="${status_codes//[[:space:]]/}" # remove whitespace
 
+	# Remove duplicates
+	urls="$( echo "${urls}" | sort -u )"
+
+	# Probe each url
 	for url in ${urls}; do
 
 		# Try to curl multiple times in case host is currently not reachable
 		i=0; fail=0
 		eval "$( curl -SsI --connect-timeout "${timeout}" "${url}" 2> >(setval errval) > >(setval header); <<<"$?" setval retval;  )"
+		# shellcheck disable=SC2154
 		while [ "${retval}" != "0" ] ; do
 			i=$(( i + 1 ))
 			sleep 2
@@ -192,19 +224,21 @@ probe_urls() {
 
 		# Curl request failed
 		if [ "${fail}" = "1" ]; then
-			printf "\e[0;31m[FAIL]\e[0m %s %s\n" "${url}" "${errval}"
+			# shellcheck disable=SC2154
+			printf "\\e[0;31m[FAIL]\\e[0m %s %s\\n" "${url}" "${errval}"
 
 		# Curl request succeeded
 		else
+			# shellcheck disable=SC2154
 			line="$( echo "${header}" | grep -E '^HTTP/(1|2)' )"
 			stat="$( echo "${line}" | awk '{print $2}' )"
 
 			#if [ "${stat}" != "200" ]; then
 			if ! echo "${stat}" | grep -qE "${status_codes}"; then
-				printf "\e[0;31m[ERR]\e[0m  %s %s\n" "${url}" "${line}"
+				printf "\\e[0;31m[ERR]\\e[0m  %s \\e[0;31m%s\\e[0m\\n" "${url}" "${line}"
 				ret_code=1
 			else
-				printf "\e[0;32m[OK]\e[0m   %s %s\n" "${url}" "${line}"
+				printf "\\e[0;32m[OK]\\e[0m   %s \\e[0;32m[%s]\\e[0m\\n" "${url}" "${stat}"
 			fi
 		fi
 	done
@@ -302,6 +336,6 @@ done
 
 
 
-MY_URLS="$( gather_urls "${SEARCH_PATH}" "${EXTENSIONS}" "${URL_REGEX_EXCLUDE}" )"
+MY_URLS="$( gather_urls "${SEARCH_PATH}" "${EXTENSIONS}" "${URL_REGEX}" "${URL_REGEX_EXCLUDE}" )"
 
 probe_urls "${MY_URLS}" "${TIMEOUT}" "${RETRIES}" "${STATUS_CODES}"

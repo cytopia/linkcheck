@@ -1,0 +1,47 @@
+# Plain URLs
+https://nierautomata.wiki.fextralife.com/How+To+Unlock+the+Secret+Trophy+Shop
+https://nierautomata.wiki.fextralife.com/Locked+Chests
+https://www.baka-tsuki.org/project/?title=Ore_no_Im%C5%8Dto_ga_Konna_ni_Kawaii_Wake_ga_Nai
+https://www.phoronix.com/scan.php?page=news_item&px=U2-NVMe-PCI-E-SSD-Adapter
+https://en.wikipedia.org/w/index.php?title=Erlang_(programming_language)&diff=847224766&oldid=847107459
+https://en.wiktionary.org/wiki/%E8%8C%B6
+
+# Single Quoted URLs
+'https://nierautomata.wiki.fextralife.com/How+To+Unlock+the+Secret+Trophy+Shop'
+'https://nierautomata.wiki.fextralife.com/Locked+Chests'
+'https://www.baka-tsuki.org/project/?title=Ore_no_Im%C5%8Dto_ga_Konna_ni_Kawaii_Wake_ga_Nai'
+'https://www.phoronix.com/scan.php?page=news_item&px=U2-NVMe-PCI-E-SSD-Adapter'
+'https://en.wikipedia.org/w/index.php?title=Erlang_(programming_language)&diff=847224766&oldid=847107459'
+'https://en.wiktionary.org/wiki/%E8%8C%B6'
+
+# Double Quoted URLs
+"https://nierautomata.wiki.fextralife.com/How+To+Unlock+the+Secret+Trophy+Shop"
+"https://nierautomata.wiki.fextralife.com/Locked+Chests"
+"https://www.baka-tsuki.org/project/?title=Ore_no_Im%C5%8Dto_ga_Konna_ni_Kawaii_Wake_ga_Nai"
+"https://www.phoronix.com/scan.php?page=news_item&px=U2-NVMe-PCI-E-SSD-Adapter"
+"https://en.wikipedia.org/w/index.php?title=Erlang_(programming_language)&diff=847224766&oldid=847107459"
+"https://en.wiktionary.org/wiki/%E8%8C%B6"
+
+# Bracketed URLs
+<https://nierautomata.wiki.fextralife.com/How+To+Unlock+the+Secret+Trophy+Shop>
+<https://nierautomata.wiki.fextralife.com/Locked+Chests>
+<https://www.baka-tsuki.org/project/?title=Ore_no_Im%C5%8Dto_ga_Konna_ni_Kawaii_Wake_ga_Nai>
+<https://www.phoronix.com/scan.php?page=news_item&px=U2-NVMe-PCI-E-SSD-Adapter>
+<https://en.wikipedia.org/w/index.php?title=Erlang_(programming_language)&diff=847224766&oldid=847107459>
+<https://en.wiktionary.org/wiki/%E8%8C%B6>
+
+# Inline URLs with punctuation
+https://nierautomata.wiki.fextralife.com/How+To+Unlock+the+Secret+Trophy+Shop,
+https://nierautomata.wiki.fextralife.com/Locked+Chests!
+https://www.baka-tsuki.org/project/?title=Ore_no_Im%C5%8Dto_ga_Konna_ni_Kawaii_Wake_ga_Nai.
+https://www.phoronix.com/scan.php?page=news_item&px=U2-NVMe-PCI-E-SSD-Adapter,
+https://en.wikipedia.org/w/index.php?title=Erlang_(programming_language)&diff=847224766&oldid=847107459!
+https://en.wiktionary.org/wiki/%E8%8C%B6,
+
+# Inline URLs with multiple punctuation
+https://nierautomata.wiki.fextralife.com/How+To+Unlock+the+Secret+Trophy+Shop,.!
+https://nierautomata.wiki.fextralife.com/Locked+Chests!.,
+https://www.baka-tsuki.org/project/?title=Ore_no_Im%C5%8Dto_ga_Konna_ni_Kawaii_Wake_ga_Nai.,!
+https://www.phoronix.com/scan.php?page=news_item&px=U2-NVMe-PCI-E-SSD-Adapter,.!
+https://en.wikipedia.org/w/index.php?title=Erlang_(programming_language)&diff=847224766&oldid=847107459!.,
+https://en.wiktionary.org/wiki/%E8%8C%B6,.!
