@@ -226,6 +226,7 @@ probe_urls() {
 		if [ "${retval}" != "0" ]; then
 			# shellcheck disable=SC2154
 			printf "\\r\\e[0;31m[FAIL]\\e[0m %s %s\\n" "${url}" "${errval}"
+			ret_code=1
 
 		# Curl request succeeded
 		else
