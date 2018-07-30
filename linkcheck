@@ -171,24 +171,22 @@ gather_urls() {
 		find_ext=" \\( -iname \\*.${extensions//,/ -o -iname \\*.} \\)"
 	fi
 
-	find_cmd="find ${path}${find_ext} -type f -exec grep -IEo '${reg_include}' {} \\; | sort -u"
+	find_cmd="find ${path}${find_ext} -type f -exec grep -IEo '${reg_include}' '{}' \\; | sort -u"
 	>&2 echo "\$ ${find_cmd}"
 
-	eval "${find_cmd}" 2>/dev/null
+	# Loop through uniqued URLs
+	for url in $(eval "${find_cmd}" 2>/dev/null); do
+		# Ignore any 'Binary file...' results
+		if echo "${url}" | grep -Eq '^htt'; then
+			# Remove any trailing garbage
+			url="$( sanitize_url "${url}" )"
 
-#	# Loop through uniqued URLs
-#	for url in $(eval "${find_cmd}" 2>/dev/null); do
-#		# Ignore any 'Binary file...' results
-#		if echo "${url}" | grep -Eq '^htt'; then
-#			# Remove any trailing garbage
-#			url="$( sanitize_url "${url}" )"
-#
-#			# Ignore URLs excluded by regex
-#			if ! echo "${url}" | grep -qE "${reg_exclude}"; then
-#				echo "${url}"
-#			fi
-#		fi
-#	done
+			# Ignore URLs excluded by regex
+			if ! echo "${url}" | grep -qE "${reg_exclude}"; then
+				echo "${url}"
+			fi
+		fi
+	done
 }
 
 
