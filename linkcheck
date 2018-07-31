@@ -57,7 +57,7 @@ STATUS_CODES=200
 ###
 URL_REGEX="http(s)?:\\/\\/[-+%=?&():,._/#0-9a-zA-Z]+"
 
-MY_VERSION="v0.4"
+MY_VERSION="v0.5"
 
 
 ############################################################
@@ -168,14 +168,14 @@ gather_urls() {
 	local find_cmd=
 
 	if [ -n "${extensions}" ]; then
-		find_ext="\\( -iname \\*.${extensions//,/ -o -iname \\*.} \\)"
+		find_ext=" \\( -iname \\*.${extensions//,/ -o -iname \\*.} \\)"
 	fi
 
-	find_cmd="find ${path} ${find_ext} -type f -exec grep --binary-files=without-match -Eo '${reg_include}' '{}' \\; | sort -u"
+	find_cmd="find ${path}${find_ext} -type f -exec grep -IEo '${reg_include}' '{}' \\; | sort -u"
 	>&2 echo "\$ ${find_cmd}"
 
 	# Loop through uniqued URLs
-	for url in $(eval "${find_cmd}" 2>/dev/null | sort -u); do
+	for url in $(eval "${find_cmd}" 2>/dev/null); do
 		# Ignore any 'Binary file...' results
 		if echo "${url}" | grep -Eq '^htt'; then
 			# Remove any trailing garbage
@@ -214,7 +214,6 @@ probe_urls() {
 		# Get header from URL
 		eval "$( curl -SsI \
 			--retry-delay 2 \
-			--retry-connrefused \
 			--retry "${retries}" \
 			--connect-timeout "${timeout}" \
 			"${url}" 2> >(setval errval) > >(setval header); <<<"$?" setval retval;
@@ -225,6 +224,7 @@ probe_urls() {
 		if [ "${retval}" != "0" ]; then
 			# shellcheck disable=SC2154
 			printf "\\r\\e[0;31m[FAIL]\\e[0m %s %s\\n" "${url}" "${errval}"
+			ret_code=1
 
 		# Curl request succeeded
 		else
