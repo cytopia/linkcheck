@@ -57,7 +57,7 @@ STATUS_CODES=200
 ###
 URL_REGEX="http(s)?:\\/\\/[-+%=?&():,._/#0-9a-zA-Z]+"
 
-MY_VERSION="v0.5"
+MY_VERSION="v0.6"
 
 
 ############################################################
@@ -144,7 +144,7 @@ setval() {
 ###
 sanitize_url() {
 	local url="${1}"
-	local invalid="[,.!]$"
+	local invalid="[,.!\)]$"
 
 	# Remove any trailing garbage
 	while [[ ${url} =~ ${invalid} ]]; do
