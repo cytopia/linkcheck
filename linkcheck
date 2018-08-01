@@ -47,6 +47,11 @@ RETRIES=3
 ###
 STATUS_CODES=200
 
+###
+### Whether or not we should follow redirects
+###
+FOLLOW_REDIRECTS=false
+
 
 ############################################################
 # Fixed global variables
@@ -68,7 +73,7 @@ MY_VERSION="v0.6"
 ### Usage
 ###
 print_usage() {
-	echo "Usage: linkcheck [-e -i -t -r -c] [<path>]"
+	echo "Usage: linkcheck [-e -i -t -r -c -l] [<path>]"
 	echo "       linkcheck --version"
 	echo "       linkcheck --help"
 	echo
@@ -107,6 +112,8 @@ print_usage() {
 	echo "            -c '200,301'"
 	echo "            -c '200,301,302'"
 	echo
+	echo "-l        Specify whether to follow redirect URLs or not."
+	echo "          This argument does not accept parameters."
 	echo
 	echo "--version Show version and exit."
 	echo "--help    Show this help screen."
@@ -211,6 +218,11 @@ probe_urls() {
 
 		printf "\\e[0;33m[TEST]\\e[0m %s ..." "${url}"
 
+		# If we follow redirects, we get the latest address first and then check it
+		if [ ${FOLLOW_REDIRECTS} = true ]; then
+			url="$(curl -Ls -o /dev/null -w %{url_effective} ${url})"
+		fi
+
 		# Get header from URL
 		eval "$( curl -SsI \
 			--retry-delay 2 \
@@ -248,7 +260,7 @@ probe_urls() {
 ############################################################
 # Entrypoint: arguments
 ############################################################
-#-e -i -t -r -c
+#-e -i -t -r -c -l
 while [ $# -gt 0  ]; do
 	case "${1}" in
 
@@ -305,7 +317,11 @@ while [ $# -gt 0  ]; do
 				exit 1
 			fi
 			;;
-
+		# ----------------------------------------
+		-l)
+			shift
+			FOLLOW_REDIRECTS=true
+			;;
 		# ----------------------------------------
 		--help)
 			print_usage
