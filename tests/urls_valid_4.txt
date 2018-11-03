@@ -1,5 +1,4 @@
 # Plain URLs
-https://nierautomata.wiki.fextralife.com/Locked+Chests
 https://www.baka-tsuki.org/project/?title=Ore_no_Im%C5%8Dto_ga_Konna_ni_Kawaii_Wake_ga_Nai
 https://www.phoronix.com/scan.php?page=news_item&px=U2-NVMe-PCI-E-SSD-Adapter
 https://en.wikipedia.org/w/index.php?title=Erlang_(programming_language)&diff=847224766&oldid=847107459
