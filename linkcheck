@@ -48,6 +48,13 @@ RETRIES=3
 STATUS_CODES=200
 
 
+###
+### Allow insecure SSL connections if chosen
+### This is exactly: curl -k
+###
+INSECURE_SSL=""
+
+
 ############################################################
 # Fixed global variables
 ############################################################
@@ -68,7 +75,7 @@ MY_VERSION="v0.6"
 ### Usage
 ###
 print_usage() {
-	echo "Usage: linkcheck [-e -i -t -r -c] [<path>]"
+	echo "Usage: linkcheck [-e -i -t -r -c -k] [<path>]"
 	echo "       linkcheck --version"
 	echo "       linkcheck --help"
 	echo
@@ -107,6 +114,9 @@ print_usage() {
 	echo "            -c '200,301'"
 	echo "            -c '200,301,302'"
 	echo
+	echo "-k        Ignore invalid SSL certificates for HTTPS connections."
+	echo "          Defaults to error on invalid SSL certificates."
+	echo "          This is just a single flag with no other arguments."
 	echo
 	echo "--version Show version and exit."
 	echo "--help    Show this help screen."
@@ -198,6 +208,7 @@ probe_urls() {
 	local timeout="${2}"
 	local retries="${3}"
 	local status_codes="${4}"
+	local insecure_ssl="${5}"
 	local ret_code=0
 
 	status_codes="${status_codes//,/|}"          # comma to |
@@ -216,6 +227,7 @@ probe_urls() {
 			--retry-delay 2 \
 			--retry "${retries}" \
 			--connect-timeout "${timeout}" \
+			"${insecure_ssl}" \
 			"${url}" 2> >(setval errval) > >(setval header); <<<"$?" setval retval;
 		)"
 
@@ -307,6 +319,12 @@ while [ $# -gt 0  ]; do
 			;;
 
 		# ----------------------------------------
+		-k)
+			shift
+			INSECURE_SSL="-k"
+			;;
+
+		# ----------------------------------------
 		--help)
 			print_usage
 			exit 0
@@ -337,4 +355,4 @@ done
 
 MY_URLS="$( gather_urls "${SEARCH_PATH}" "${EXTENSIONS}" "${URL_REGEX}" "${URL_REGEX_EXCLUDE}" )"
 
-probe_urls "${MY_URLS}" "${TIMEOUT}" "${RETRIES}" "${STATUS_CODES}"
+probe_urls "${MY_URLS}" "${TIMEOUT}" "${RETRIES}" "${STATUS_CODES}" "${INSECURE_SSL}"
