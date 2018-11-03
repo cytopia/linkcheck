@@ -47,7 +47,7 @@ linkcheck -i '^http(s)?:\/\/(localhost)|(127\.0\.0\.1|.)|(.+\.loc).*$' path/to/m
 ## Usage
 
 ```
-Usage: linkcheck [-e -i -t -r -c] [<path>]
+Usage: linkcheck [-e -i -t -r -c -k] [<path>]
 
 Options:
 
@@ -82,6 +82,20 @@ Options:
             -c '200'
             -c '200,301'
             -c '200,301,302'
+
+-k        Ignore invalid SSL certificates for HTTPS connections.
+          Defaults to error on invalid SSL certificates.
+          This is just a single flag with no other arguments.
+
+
+--version Show version and exit.
+--help    Show this help screen.
+
+
+Optional arguments:
+
+<path>    Specify what directory to scan files for URLs.
+          Defaults to current directory.
 ```
 
 ## License
