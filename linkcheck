@@ -154,7 +154,7 @@ setval() {
 ###
 sanitize_url() {
 	local url="${1}"
-	local invalid="[,.!\)]$"
+	local invalid="[,.!\\)]\$"
 
 	# Remove any trailing garbage
 	while [[ ${url} =~ ${invalid} ]]; do
