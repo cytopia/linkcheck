@@ -55,6 +55,13 @@ STATUS_CODES=200
 INSECURE_SSL=""
 
 
+###
+### Follow redirects
+### This is exactly: curl -L
+###
+FOLLOW_REDIRECT=""
+
+
 ############################################################
 # Fixed global variables
 ############################################################
@@ -64,7 +71,7 @@ INSECURE_SSL=""
 ###
 URL_REGEX="http(s)?:\\/\\/[-+%=?&():,._/#0-9a-zA-Z]+"
 
-MY_VERSION="v0.8"
+MY_VERSION="v0.9"
 
 
 ############################################################
@@ -75,7 +82,7 @@ MY_VERSION="v0.8"
 ### Usage
 ###
 print_usage() {
-	echo "Usage: linkcheck [-e -i -t -r -c -k] [<path>]"
+	echo "Usage: linkcheck [-e -i -t -r -c -k -l] [<path>]"
 	echo "       linkcheck --version"
 	echo "       linkcheck --help"
 	echo
@@ -115,8 +122,12 @@ print_usage() {
 	echo "            -c '200,301,302'"
 	echo
 	echo "-k        Ignore invalid SSL certificates for HTTPS connections."
+	echo "          This argument does not accept any parameters."
 	echo "          Defaults to error on invalid SSL certificates."
-	echo "          This is just a single flag with no other arguments."
+	echo
+	echo "-l        Specify whether to follow redirect URLs or not."
+	echo "          This argument does not accept any parameters."
+	echo "          Defaults to not following redirects."
 	echo
 	echo "--version Show version and exit."
 	echo "--help    Show this help screen."
@@ -209,6 +220,7 @@ probe_urls() {
 	local retries="${3}"
 	local status_codes="${4}"
 	local insecure_ssl="${5}"
+	local follow_redirect="${6}"
 	local ret_code=0
 
 	status_codes="${status_codes//,/|}"          # comma to |
@@ -228,6 +240,7 @@ probe_urls() {
 			--retry "${retries}" \
 			--connect-timeout "${timeout}" \
 			"${insecure_ssl}" \
+			"${follow_redirect}" \
 			"${url}" 2> >(setval errval) > >(setval header); <<<"$?" setval retval;
 		)"
 
@@ -244,11 +257,14 @@ probe_urls() {
 			line="$( echo "${header}" | grep -E '^HTTP/(1|2)' )"
 			stat="$( echo "${line}" | awk '{print $2}' )"
 
-			#if [ "${stat}" != "200" ]; then
-			if ! echo "${stat}" | grep -qE "${status_codes}"; then
+			if ! echo "${stat}" | tail -1 | grep -qE "${status_codes}"; then
+				# Fix error line for multiline (in case of redirects via -l option)
+				line="$( echo "${line}" | paste -sd "," | sed 's/,/ -> /g' )"
 				printf "\\r\\e[0;31m[ERR]\\e[0m  %s \\e[0;31m%s\\e[0m\\n" "${url}" "${line}"
 				ret_code=1
 			else
+				# Fix status code for multiline (in case of redirects via -l option)
+				stat="$( echo "${stat}" | paste -sd "," | sed 's/,/ -> /g' )"
 				printf "\\r\\e[0;32m[OK]\\e[0m   %s \\e[0;32m[%s]\\e[0m\\n" "${url}" "${stat}"
 			fi
 		fi
@@ -324,6 +340,11 @@ while [ $# -gt 0  ]; do
 			;;
 
 		# ----------------------------------------
+		-l)
+			FOLLOW_REDIRECT="-L"
+			;;
+
+		# ----------------------------------------
 		--help)
 			print_usage
 			exit 0
@@ -354,4 +375,4 @@ done
 
 MY_URLS="$( gather_urls "${SEARCH_PATH}" "${EXTENSIONS}" "${URL_REGEX}" "${URL_REGEX_EXCLUDE}" )"
 
-probe_urls "${MY_URLS}" "${TIMEOUT}" "${RETRIES}" "${STATUS_CODES}" "${INSECURE_SSL}"
+probe_urls "${MY_URLS}" "${TIMEOUT}" "${RETRIES}" "${STATUS_CODES}" "${INSECURE_SSL}" "${FOLLOW_REDIRECT}"
