@@ -43,11 +43,25 @@ linkcheck -e 'rst' -c '200' path/to/my/docs
 linkcheck -i '^http(s)?:\/\/(localhost)|(127\.0\.0\.1|.)|(.+\.loc).*$' path/to/my/docs
 ```
 
+#### Ignore invalid SSL certificates
+```bash
+linkcheck -k -c '200' path/to/my/docs
+```
+
+#### Follow redirects and only evaluate final HTTP code
+```bash
+# Ensure only 200 is returned from the last redirected page
+linkcheck -l -c '200' path/to/my/docs
+```
+
 
 ## Usage
 
 ```
-Usage: linkcheck [-e -i -t -r -c -k] [<path>]
+Usage: linkcheck [-e -i -t -r -c -k -l] [<path>]
+       linkcheck --version
+       linkcheck --help
+
 
 Options:
 
@@ -87,6 +101,9 @@ Options:
           Defaults to error on invalid SSL certificates.
           This is just a single flag with no other arguments.
 
+-l        Specify whether to follow redirect URLs or not.
+          This argument does not accept parameters.
+          Defaults to not following redirects.
 
 --version Show version and exit.
 --help    Show this help screen.
