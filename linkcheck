@@ -71,7 +71,7 @@ FOLLOW_REDIRECT=""
 ###
 URL_REGEX="http(s)?:\\/\\/[-+%=?&():,._/#0-9a-zA-Z]+"
 
-MY_VERSION="v0.9"
+MY_VERSION="v0.10"
 
 
 ############################################################
@@ -259,8 +259,8 @@ probe_urls() {
 
 			if ! echo "${stat}" | tail -1 | grep -qE "${status_codes}"; then
 				# Fix error line for multiline (in case of redirects via -l option)
-				line="$( echo "${line}" | paste -sd "," | sed 's/,/ -> /g' )"
-				printf "\\r\\e[0;31m[ERR]\\e[0m  %s \\e[0;31m%s\\e[0m\\n" "${url}" "${line}"
+				line="$( echo "${line}" | paste -sd "," | sed 's/,/ -> /g' | head -1 | xargs )"
+				printf "\\r\\e[0;31m[ERR]\\e[0m  %s \\e[0;31m[%s]\\e[0m\\n" "${url}" "${line}"
 				ret_code=1
 			else
 				# Fix status code for multiline (in case of redirects via -l option)
