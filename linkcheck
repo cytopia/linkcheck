@@ -71,7 +71,25 @@ FOLLOW_REDIRECT=""
 ###
 URL_REGEX="http(s)?:\\/\\/[-+%=?&():,._/#0-9a-zA-Z]+"
 
-MY_VERSION="v0.10"
+MY_VERSION="v0.11"
+
+
+###
+### Curl defaults
+###
+### Some sites are very pickey about giving you correct return code if they think
+### you are nun human-enough.
+### This adds some sane defaults to all curl requests
+###
+### Note: Additionally 'Host' will be added dynamically
+###       Host: FQDN of URL
+###
+CURL_DEFAULTS=""
+CURL_DEFAULTS="${CURL_DEFAULTS} -H 'Cache-Control: max-age=0'"
+CURL_DEFAULTS="${CURL_DEFAULTS} -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36'"
+CURL_DEFAULTS="${CURL_DEFAULTS} -H 'Accept-Language: en-US,en;q=0.8,en-GB;q=0.6,es;q=0.4'"
+CURL_DEFAULTS="${CURL_DEFAULTS} -H 'DNT: 1'"
+CURL_DEFAULTS="${CURL_DEFAULTS} -H 'Referer: https://www.google.com'"
 
 
 ############################################################
@@ -221,6 +239,7 @@ probe_urls() {
 	local status_codes="${4}"
 	local insecure_ssl="${5}"
 	local follow_redirect="${6}"
+	local host=
 	local ret_code=0
 
 	status_codes="${status_codes//,/|}"          # comma to |
@@ -232,17 +251,23 @@ probe_urls() {
 	# Probe each url
 	for url in ${urls}; do
 
+		# Determine hostname for Host header
+		host="$( echo "${url}" | sed 's|^http\(s\)*://||g' | sed 's|/.*$||g' )"
+
+		opts="-SsI"
+		opts="${opts} --retry-delay 2"
+		opts="${opts} --retry ${retries}"
+		opts="${opts} --connect-timeout ${timeout}"
+		opts="${opts} ${insecure_ssl}"
+		opts="${opts} -H 'Host: ${host}'"
+		opts="${opts} ${CURL_DEFAULTS}"
+		opts="${opts} ${follow_redirect}"
+		#echo "curl ${opts} ${url}"
+
 		printf "\\e[0;33m[TEST]\\e[0m %s ..." "${url}"
 
 		# Get header from URL
-		eval "$( curl -SsI \
-			--retry-delay 2 \
-			--retry "${retries}" \
-			--connect-timeout "${timeout}" \
-			"${insecure_ssl}" \
-			"${follow_redirect}" \
-			"${url}" 2> >(setval errval) > >(setval header); <<<"$?" setval retval;
-		)"
+		eval "$(eval "curl  ${opts} \"${url}\"" 2> >(setval errval) > >(setval header); <<<$? setval retval)";
 
 		# Curl request failed
 		# shellcheck disable=SC2154
