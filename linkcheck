@@ -71,7 +71,7 @@ FOLLOW_REDIRECT=""
 ###
 URL_REGEX="http(s)?:\\/\\/[-+%=?&():,._/#0-9a-zA-Z]+"
 
-MY_VERSION="v0.11"
+MY_VERSION="v0.12"
 
 
 ###
@@ -239,6 +239,13 @@ probe_urls() {
 	local status_codes="${4}"
 	local insecure_ssl="${5}"
 	local follow_redirect="${6}"
+
+	local clr_test="\033[0;33m"  # Yellow
+	local clr_fail="\033[0;31m"  # Red
+	local clr_err="\033[0;31m"   # Red
+	local clr_ok="\033[0;32m"    # Green
+	local clr_rst="\033[m"       # Reset to normal
+
 	local host=
 	local ret_code=0
 
@@ -264,7 +271,7 @@ probe_urls() {
 		opts="${opts} ${follow_redirect}"
 		#echo "curl ${opts} ${url}"
 
-		printf "\\e[0;33m[TEST]\\e[0m %s ..." "${url}"
+		printf "${clr_test}[TEST]${clr_rst} %s ..." "${url}"
 
 		# Get header from URL
 		eval "$(eval "curl  ${opts} \"${url}\"" 2> >(setval errval) > >(setval header); <<<$? setval retval)";
@@ -273,7 +280,7 @@ probe_urls() {
 		# shellcheck disable=SC2154
 		if [ "${retval}" != "0" ]; then
 			# shellcheck disable=SC2154
-			printf "\\r\\e[0;31m[FAIL]\\e[0m %s %s\\n" "${url}" "${errval}"
+			printf "\r${clr_fail}[FAIL]${clr_rst} %s %s\n" "${url}" "${errval}"
 			ret_code=1
 
 		# Curl request succeeded
@@ -284,13 +291,13 @@ probe_urls() {
 
 			if ! echo "${stat}" | tail -1 | grep -qE "${status_codes}"; then
 				# Fix error line for multiline (in case of redirects via -l option)
-				line="$( echo "${line}" | paste -sd "," | sed 's/,/ -> /g' | head -1 | xargs )"
-				printf "\\r\\e[0;31m[ERR]\\e[0m  %s \\e[0;31m[%s]\\e[0m\\n" "${url}" "${line}"
+				line="$( echo "${line}" | paste -sd "," | sed 's/,/ -> /g' | head -1 | tr -d '\n' | tr -d '\r' | sed 's/\s*$//g' )"
+				printf "\r${clr_err}[ERR]${clr_rst}  %s ${clr_err}%s${clr_rst}\n" "${url}" "(${line})"
 				ret_code=1
 			else
 				# Fix status code for multiline (in case of redirects via -l option)
 				stat="$( echo "${stat}" | paste -sd "," | sed 's/,/ -> /g' )"
-				printf "\\r\\e[0;32m[OK]\\e[0m   %s \\e[0;32m[%s]\\e[0m\\n" "${url}" "${stat}"
+				printf "\r${clr_ok}[OK]${clr_rst}   %s ${clr_ok}%s${clr_rst}\n" "${url}" "(${stat})"
 			fi
 		fi
 	done

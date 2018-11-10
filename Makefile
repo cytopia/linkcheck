@@ -4,8 +4,7 @@ help:
 	@printf "%s\n"   "make help             Show help"
 
 test:
-	./linkcheck -r 10 -t 30 tests/urls_valid_4.txt
-	./linkcheck -r 10 -t 30 tests/urls_valid_4.txt | grep -c '[ok]'
+	./tests/test.sh
 
 lint:
 	shellcheck --shell=bash linkcheck

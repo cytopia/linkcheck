@@ -1,0 +1,5 @@
+# Redirect URLS
+https://google.com
+https://yahoo.com
+https://bing.com
+https://www.duckduckgo.com
