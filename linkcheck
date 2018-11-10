@@ -291,13 +291,13 @@ probe_urls() {
 
 			if ! echo "${stat}" | tail -1 | grep -qE "${status_codes}"; then
 				# Fix error line for multiline (in case of redirects via -l option)
-				line="$( echo "${line}" | paste -sd "," | sed 's/,/ -> /g' | head -1 | xargs )"
-				printf "\r${clr_err}[ERR]${clr_rst}  %s ${clr_err}%s${clr_rst}\n" "${url}" "[${line}]"
+				line="$( echo "${line}" | paste -sd "," | sed 's/,/ -> /g' | head -1 | tr -d '\n' | tr -d '\r' | sed 's/\s*$//g' )"
+				printf "\r${clr_err}[ERR]${clr_rst}  %s ${clr_err}%s${clr_rst}\n" "${url}" "(${line})"
 				ret_code=1
 			else
 				# Fix status code for multiline (in case of redirects via -l option)
 				stat="$( echo "${stat}" | paste -sd "," | sed 's/,/ -> /g' )"
-				printf "\r${clr_ok}[OK]${clr_rst}   %s ${clr_ok}%s${clr_rst}\n" "${url}" "[${stat}]"
+				printf "\r${clr_ok}[OK]${clr_rst}   %s ${clr_ok}%s${clr_rst}\n" "${url}" "(${stat})"
 			fi
 		fi
 	done
