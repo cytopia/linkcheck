@@ -240,11 +240,11 @@ probe_urls() {
 	local insecure_ssl="${5}"
 	local follow_redirect="${6}"
 
-	local clr_test="\033[0;33m"  # Yellow
-	local clr_fail="\033[0;31m"  # Red
-	local clr_err="\033[0;31m"   # Red
-	local clr_ok="\033[0;32m"    # Green
-	local clr_rst="\033[m"       # Reset to normal
+	local clr_test="\\033[0;33m"  # Yellow
+	local clr_fail="\\033[0;31m"  # Red
+	local clr_err="\\033[0;31m"   # Red
+	local clr_ok="\\033[0;32m"    # Green
+	local clr_rst="\\033[m"       # Reset to normal
 
 	local host=
 	local ret_code=0
@@ -280,7 +280,7 @@ probe_urls() {
 		# shellcheck disable=SC2154
 		if [ "${retval}" != "0" ]; then
 			# shellcheck disable=SC2154
-			printf "\r${clr_fail}[FAIL]${clr_rst} %s %s\n" "${url}" "${errval}"
+			printf "\\r${clr_fail}[FAIL]${clr_rst} %s %s\\n" "${url}" "${errval}"
 			ret_code=1
 
 		# Curl request succeeded
@@ -297,7 +297,7 @@ probe_urls() {
 			else
 				# Fix status code for multiline (in case of redirects via -l option)
 				stat="$( echo "${stat}" | paste -sd "," | sed 's/,/ -> /g' )"
-				printf "\r${clr_ok}[OK]${clr_rst}   %s ${clr_ok}%s${clr_rst}\n" "${url}" "(${stat})"
+				printf "\\r${clr_ok}[OK]${clr_rst}   %s ${clr_ok}%s${clr_rst}\\n" "${url}" "(${stat})"
 			fi
 		fi
 	done
