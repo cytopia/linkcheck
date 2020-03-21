@@ -58,7 +58,7 @@ linkcheck -l -c '200' path/to/my/docs
 ## Usage
 
 ```
-Usage: linkcheck [-e -i -t -r -c -k -l] [<path>]
+Usage: linkcheck [-e -i -t -r -c -k -l -v] [<path>]
        linkcheck --version
        linkcheck --help
 
@@ -104,6 +104,8 @@ Options:
 -l        Specify whether to follow redirect URLs or not.
           This argument does not accept parameters.
           Defaults to not following redirects.
+
+-v        Be verbose and also show affected files.
 
 --version Show version and exit.
 --help    Show this help screen.

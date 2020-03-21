@@ -62,6 +62,12 @@ INSECURE_SSL=""
 FOLLOW_REDIRECT=""
 
 
+###
+### Be verbose
+###
+VERBOSE=0
+
+
 ############################################################
 # Fixed global variables
 ############################################################
@@ -71,7 +77,7 @@ FOLLOW_REDIRECT=""
 ###
 URL_REGEX="http(s)?:\\/\\/[-+%=?&():,._/#0-9a-zA-Z]+"
 
-MY_VERSION="v0.12"
+MY_VERSION="v0.14"
 
 
 ###
@@ -100,7 +106,7 @@ CURL_DEFAULTS="${CURL_DEFAULTS} -H 'Referer: https://www.google.com'"
 ### Usage
 ###
 print_usage() {
-	echo "Usage: linkcheck [-e -i -t -r -c -k -l] [<path>]"
+	echo "Usage: linkcheck [-e -i -t -r -c -k -l -v] [<path>]"
 	echo "       linkcheck --version"
 	echo "       linkcheck --help"
 	echo
@@ -146,6 +152,8 @@ print_usage() {
 	echo "-l        Specify whether to follow redirect URLs or not."
 	echo "          This argument does not accept any parameters."
 	echo "          Defaults to not following redirects."
+	echo
+	echo "-v        Be verbose and also show affected files."
 	echo
 	echo "--version Show version and exit."
 	echo "--help    Show this help screen."
@@ -230,6 +238,25 @@ gather_urls() {
 
 
 ###
+### Gather files by URL
+###
+gather_files_by_url() {
+	local url="${1}"
+	local path="${2}"
+	local extensions="${3}"
+
+	local find_ext=
+	local find_cmd=
+
+	if [ -n "${extensions}" ]; then
+		find_ext=" \\( -iname \\*.${extensions//,/ -o -iname \\*.} \\)"
+	fi
+
+	find "${path}${find_ext}" -type f -exec grep -FHIn "${url}" '{}' \; | sort -u
+}
+
+
+###
 ### Probe URLs for availability
 ###
 probe_urls() {
@@ -292,7 +319,11 @@ probe_urls() {
 			if ! echo "${stat}" | tail -1 | grep -qE "${status_codes}"; then
 				# Fix error line for multiline (in case of redirects via -l option)
 				line="$( echo "${line}" | paste -sd "," | sed 's/,/ -> /g' | head -1 | tr -d '\n' | tr -d '\r' | sed 's/\s*$//g' )"
-				printf "\r${clr_err}[ERR]${clr_rst}  %s ${clr_err}%s${clr_rst}\n" "${url}" "(${line})"
+				printf "\\r${clr_err}[ERR]${clr_rst}  %s ${clr_err}%s${clr_rst}\\n" "${url}" "(${line})"
+				if [ "${VERBOSE}" -eq "1" ]; then
+					gather_files_by_url "${url}" "${SEARCH_PATH}" "${EXTENSIONS}"
+				fi
+
 				ret_code=1
 			else
 				# Fix status code for multiline (in case of redirects via -l option)
@@ -374,6 +405,11 @@ while [ $# -gt 0  ]; do
 		# ----------------------------------------
 		-l)
 			FOLLOW_REDIRECT="-L"
+			;;
+
+		# ----------------------------------------
+		-v)
+			VERBOSE=1
 			;;
 
 		# ----------------------------------------
