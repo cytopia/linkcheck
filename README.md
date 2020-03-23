@@ -54,6 +54,11 @@ linkcheck -k -c '200' path/to/my/docs
 linkcheck -l -c '200' path/to/my/docs
 ```
 
+#### Show files which have invalid links
+```bash
+linkcheck -v path/to/my/docs
+```
+
 
 ## Usage
 
@@ -116,6 +121,7 @@ Optional arguments:
 <path>    Specify what directory to scan files for URLs.
           Defaults to current directory.
 ```
+
 
 ## License
 
