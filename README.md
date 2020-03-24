@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/cytopia/linkcheck.svg?branch=master)](https://travis-ci.org/cytopia/linkcheck)
 ![Tag](https://img.shields.io/github/tag/cytopia/linkcheck.svg)
+[![](https://img.shields.io/docker/pulls/cytopia/linkcheck.svg)](https://hub.docker.com/r/cytopia/linkcheck)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 `linkcheck` was created in order to ensure that none of your files have broken links.
