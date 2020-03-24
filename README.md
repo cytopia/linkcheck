@@ -16,6 +16,13 @@ there is already a bundled `linkcheck` tool. However this does not work on `raw:
 * bash
 * curl
 
+Or use Docker:
+
+[![Docker hub](http://dockeri.co/image/cytopia/linkcheck?kill_cache=1)](https://hub.docker.com/r/cytopia/linkcheck)
+
+**https://github.com/cytopia/docker-linkcheck**
+
+
 
 ## Examples
 
